@@ -83,7 +83,7 @@ class _HomeState extends State<Home> {
                   CircleAvatar(
                     radius: 40,
                   ),
-                  Text("Geovane Araújo",
+                  Text("Geovane Araujo",
                     style: TextStyle(
                         color: CustomStyle.primaryColor,
                         fontSize: 24
