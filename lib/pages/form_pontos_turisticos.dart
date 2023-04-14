@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:vixi/repository/pontos_turisticos.dart';
 
 import '../model/PontosTuristicos.dart';
 import '../style/CustomStyle.dart';
@@ -31,12 +32,16 @@ class _FormPontosTuristicosState extends State<FormPontosTuristicos> {
   TextEditingController description = new TextEditingController();
   TextEditingController detail = new TextEditingController();
   TextEditingController date = new TextEditingController();
+  TextEditingController diferenciais = new TextEditingController();
+  var _id = null;
 
   @override
   void initState() {
     if(widget.pontoT != null){
       description.text = widget.pontoT!.descricao;
       detail.text = widget.pontoT!.detalhes;
+      diferenciais.text = widget.pontoT!.diferenciais;
+      _id = widget.pontoT!.id;
     }
   }
 
@@ -65,7 +70,11 @@ class _FormPontosTuristicosState extends State<FormPontosTuristicos> {
                     ),
                     CustomInputTextArea(
                       controller: detail,
-                      hint: "Descrição",
+                      hint: "Detalhes",
+                    ),
+                    CustomInputTextArea(
+                      controller: diferenciais,
+                      hint: "Diferenciais",
                     ),
                   ],
                 ),
@@ -77,24 +86,18 @@ class _FormPontosTuristicosState extends State<FormPontosTuristicos> {
               backgroundColor: CustomStyle.primaryColor,
               hint: "Salvar",
               onPressed: () {
-                Random r = new Random();
                 PontosTuristicos ponto = new PontosTuristicos(data: DateTime.now());
-
                 ponto.descricao = description.text;
                 ponto.data = DateTime.now();
                 ponto.detalhes = detail.text;
+                ponto.diferenciais = diferenciais.text;
+                if(_id != null)
+                  ponto.id = _id;
 
-                if(widget.pontoT == null){
-                  ponto.id = r.nextInt(10000);
-                  ListPontos.pontos.add(ponto);
-                } else {
-                  int index = 1;
-                  ponto.id = widget.pontoT!.id;
-                  ListPontos.pontos.removeWhere((element) => element.id == widget.pontoT!.id );
-                  ListPontos.pontos.add(ponto);
-                }
+                PontosTuristicosRepository pontos_repository = new PontosTuristicosRepository();
+                pontos_repository.onSave(ponto);
 
-                Navigator.pop(context,MaterialPageRoute(builder: (context) => ListPontosTuristicos()));
+                Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => ListPontosTuristicos()));
               },
             ),
           )

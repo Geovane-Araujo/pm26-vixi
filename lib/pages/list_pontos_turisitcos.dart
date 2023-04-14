@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../enuns/Menu.dart';
 import '../model/PontosTuristicos.dart';
+import '../repository/pontos_turisticos.dart';
 import '../style/CustomStyle.dart';
 import '../widgets/component/custom_input_date.dart';
 import '../widgets/component/custom_input_text.dart';
@@ -19,12 +20,19 @@ class _ListPontosTuristicosState extends State<ListPontosTuristicos> {
 
   TextEditingController texfilter = new TextEditingController();
   TextEditingController datefilter = new TextEditingController();
-
+  PontosTuristicosRepository pontos_repository = new PontosTuristicosRepository();
   @override
   void initState() {
-    print("dsljdk");
+    onReloadData();
   }
 
+  onReloadData(){
+    pontos_repository.onGetAll("1 = 1").then((value) => {
+      setState(() {
+        ListPontos.pontos = value;
+      })
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +104,7 @@ class _ListPontosTuristicosState extends State<ListPontosTuristicos> {
           children: [
             Expanded(
               child: Container(
+                margin: EdgeInsets.only(left: 10),
                 child: Text(
                   ponto.descricao,
                   style: TextStyle(
@@ -110,15 +119,13 @@ class _ListPontosTuristicosState extends State<ListPontosTuristicos> {
                 tooltip: "Opções",
                 icon: Icon(Icons.menu),
                 onSelected: (Menu item) {
-                  setState(() {
+                  setState(() async {
                     if(item == Menu.Editar){
                       Navigator.push(context,MaterialPageRoute(builder: (context) => FormPontosTuristicos(pontoT: ponto)));
-                      setState(() {
-                        ListPontos.pontos;
-                      });
                     } else {
-                      ListPontos.pontos.remove(ponto);
+                       await pontos_repository.onDelete(ponto!.id);
                     }
+                    onReloadData();
                   });
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
